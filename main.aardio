@@ -2,10 +2,10 @@
 import fonts.fontAwesome;
 import win.ui;
 /*DSG{{*/
-var winform = win.form(text="qrfs - 扫码快传 v2.2";right=807;bottom=465;bgcolor=16777215;border="none";max=false)
+var winform = win.form(text="qrfs - 扫码快传 v2.3";right=807;bottom=465;bgcolor=16777215;border="none";max=false)
 winform.add(
 bk={cls="bk";left=-2;top=-5;right=810;bottom=29;bgcolor=15790320;dl=1;dr=1;dt=1;forecolor=12639424;linearGradient=0;z=10};
-bkplus={cls="bkplus";text="qrfs - 扫码快传  v2.2";left=35;top=3;right=220;bottom=25;align="left";color=5921370;dl=1;dt=1;z=11};
+bkplus={cls="bkplus";text="qrfs - 扫码快传  v2.3";left=35;top=3;right=220;bottom=25;align="left";color=5921370;dl=1;dt=1;z=11};
 btnOpen={cls="plus";text='\uF115';left=444;top=50;right=479;bottom=75;dr=1;dt=1;font=LOGFONT(h=-16;name='FontAwesome');notify=1;z=6};
 btnOpenUpload={cls="plus";text="打开上传目录";left=161;top=86;right=302;bottom=115;dl=1;dt=1;font=LOGFONT(h=-15);iconStyle={align="left";font=LOGFONT(h=-15;name='FontAwesome');padding={left=8;top=2}};iconText='\uF115';notify=1;textPadding={left=20};z=12};
 btnStart={cls="plus";text="重启服务";left=655;top=47;right=755;bottom=76;bgcolor=14935259;dr=1;dt=1;font=LOGFONT(h=-15);iconStyle={align="left";font=LOGFONT(h=-15;name='FontAwesome');padding={left=8;top=2}};iconText='\uF233';notify=1;textPadding={left=20};z=5};
@@ -190,7 +190,7 @@ srvHttp.run(
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<title>qrfs - 扫码快传  v2.2</title>
+<title>qrfs - 扫码快传  v2.3</title>
 <style>`+$"/include/filepond.min.css"+`</style>
 <script>`+$"/include/filepond.min.js"+`</script> 
 <script>
@@ -437,8 +437,8 @@ websocket = new WebSocket("`+wsrv.getUrl("ws",true)+`");
 var clipboardContent;
 websocket.onmessage = function(evt) {
     if(evt.data=="reload"){
-        //window.location.pathname = "/";
-    	//window.location.reload(true)
+        window.location.pathname = "/";
+    	window.location.reload(true)
     }
     else{ 
         if(clipboardContent){
@@ -481,10 +481,6 @@ FilePond.setOptions({
 	labelTapToRetry: '点击重试',
 	labelFileLoadError: '上传时遇到错误'
 });
-
-FilePond.onaddfile = function(err,file){
-	console.log('file added event', file);
-} 
 
 </script> `)
 }
@@ -653,6 +649,7 @@ winform.onDropFiles = function(files){
 	if(!fsys.isDir(path)){
 		path = fsys.getParentDir(path)
 	}
+	
 	winform.editDocumentRoot.text = path;
 	srvHttp.documentRoot = path;
 	config.winform.txtMessage = path;
