@@ -3,7 +3,7 @@
 
 [下载](dist/qrfs.7z) 仅 726 KB。软件非常小，简单方便，传输大文件快如闪电。软件兼容 XP，Vista，Win7，Win8，Win10，Win11 等所有桌面操作系统。
 
-![qrfs 电脑界面截图](screenshots/qrfs.jpg)
+![qrfs 电脑界面截图](screenshots/qrfs2.jpg)
 
 在电脑上运行后，只要把文件或目录拖拽到窗口上就可以共享文件。全局域网都可以通过网页访问，手机扫码就可以打开网页端。 
 
