@@ -1,31 +1,46 @@
-//扫码传文件
+//扫码传文件 - v2.6 (增强版)
+import inet.url;
+import string.html;
 import fonts.fontAwesome;
 import win.ui;
+import win.clip;
+import win.clip.viewer;
+import fsys;
+import fsys.info;
+import fsys.config;
+import fsys.dlg.dir;
+import fsys.update.simpleMain;
+import process;
+import web.socket.server;
+import qrencode.bitmap;
+import win.ui.simpleWindow2;
+import win.ui.menu;
 /*DSG{{*/
-var winform = win.form(text="qrfs - 扫码快传 v2.3";right=807;bottom=465;bgcolor=16777215;border="none";max=false)
+var winform = win.form(text="qrfs - 扫码快传 v2.6";right=807;bottom=465;bgcolor=0xFFFFFF;border="none";max=false)
 winform.add(
-bk={cls="bk";left=-2;top=-5;right=810;bottom=29;bgcolor=15790320;dl=1;dr=1;dt=1;forecolor=12639424;linearGradient=0;z=10};
-bkplus={cls="bkplus";text="qrfs - 扫码快传  v2.3";left=35;top=3;right=220;bottom=25;align="left";color=5921370;dl=1;dt=1;z=11};
-btnOpen={cls="plus";text='\uF115';left=444;top=50;right=479;bottom=75;dr=1;dt=1;font=LOGFONT(h=-16;name='FontAwesome');notify=1;z=6};
-btnOpenUpload={cls="plus";text="打开上传目录";left=161;top=86;right=302;bottom=115;dl=1;dt=1;font=LOGFONT(h=-15);iconStyle={align="left";font=LOGFONT(h=-15;name='FontAwesome');padding={left=8;top=2}};iconText='\uF115';notify=1;textPadding={left=20};z=12};
-btnStart={cls="plus";text="重启服务";left=655;top=47;right=755;bottom=76;bgcolor=14935259;dr=1;dt=1;font=LOGFONT(h=-15);iconStyle={align="left";font=LOGFONT(h=-15;name='FontAwesome');padding={left=8;top=2}};iconText='\uF233';notify=1;textPadding={left=20};z=5};
-editDocumentRoot={cls="plus";left=131;top=49;right=430;bottom=73;align="right";border={bottom=1;color=-8355712};dl=1;dr=1;dt=1;editable=1;font=LOGFONT(h=-16);z=8};
-editPassword={cls="plus";left=441;top=84;right=632;bottom=108;align="left";border={bottom=1;color=-8355712};dr=1;dt=1;editable=1;font=LOGFONT(h=-16);z=14};
-editPort={cls="plus";left=550;top=49;right=628;bottom=73;align="left";border={bottom=1;color=-8355712};dr=1;dt=1;editable=1;font=LOGFONT(h=-16);z=9};
-plus={cls="plus";text="访问密码：";left=332;top=90;right=433;bottom=114;align="right";dl=1;dr=1;dt=1;font=LOGFONT(h=-15);transparent=1;z=13};
-plus2={cls="plus";left=38;top=128;right=472;bottom=422;align="left";border={color=-16744448;radius=8;width=1};db=1;dl=1;dr=1;dt=1;font=LOGFONT(h=-14);textPadding={left=16};valign="top";z=1};
+bk={cls="bk";left=-2;top=-5;right=810;bottom=29;bgcolor=0xF0F0F0;dl=1;dr=1;dt=1;forecolor=0xC0DCC0;linearGradient=0;z=10};
+bkplus={cls="bkplus";text="qrfs - 扫码快传  v2.6";left=35;top=3;right=220;bottom=25;align="left";color=0x5A5A5A;dl=1;dt=1;z=11};
+btnOpen={cls="plus";text='\uF115';left=441;top=36;right=476;bottom=61;dr=1;dt=1;font=LOGFONT(h=-16;name='FontAwesome');notify=1;z=6};
+btnOpenUpload={cls="plus";text="打开上传目录";left=506;top=32;right=647;bottom=61;dl=1;dt=1;font=LOGFONT(h=-15);iconStyle={align="left";font=LOGFONT(h=-15;name='FontAwesome');padding={left=8;top=2}};iconText='\uF045';notify=1;textPadding={left=20};z=12};
+btnStart={cls="plus";text="重启服务";left=627;top=72;right=760;bottom=118;align="left";bgcolor=0xE3E4DB;dr=1;dt=1;font=LOGFONT(h=-15);iconStyle={align="left";font=LOGFONT(h=-19;name='FontAwesome');padding={left=16}};iconText='\uF233';notify=1;textPadding={left=45;bottom=2};z=5};
+editDocumentRoot={cls="plus";left=131;top=35;right=430;bottom=59;align="left";border={bottom=1;color=0xFF808080};dl=1;dr=1;dt=1;editable="edit";font=LOGFONT(h=-16);textPadding={bottom=2};z=8};
+editHost={cls="plus";left=131;top=64;right=430;bottom=88;align="left";border={bottom=1;color=0xFF808080};dr=1;dt=1;editable="edit";font=LOGFONT(h=-16);textPadding={bottom=2};z=19};
+editPassword={cls="plus";left=131;top=95;right=430;bottom=119;align="left";border={bottom=1;color=0xFF808080};dr=1;dt=1;editable="edit";font=LOGFONT(h=-16);password=1;textPadding={right=24;bottom=2};z=14};
+editPort={cls="plus";left=501;top=67;right=587;bottom=91;align="left";border={bottom=1;color=0xFF808080};dr=1;dt=1;editable=1;font=LOGFONT(h=-16);z=9};
+plus={cls="plus";text="密码：";left=71;top=98;right=129;bottom=122;align="right";dl=1;dr=1;dt=1;font=LOGFONT(h=-15);transparent=1;z=13};
+plus2={cls="plus";left=38;top=130;right=472;bottom=424;align="left";border={color=0xFF008000;radius=8;width=1};db=1;dl=1;dr=1;dt=1;font=LOGFONT(h=-14);textPadding={left=16};valign="top";z=1};
+plus3={cls="plus";text="自定义网址：";left=9;top=68;right=129;bottom=92;align="right";dr=1;dt=1;font=LOGFONT(h=-15);transparent=1;z=20};
 qr={cls="plus";left=499;top=132;right=760;bottom=418;db=1;dr=1;dt=1;repeat="scale";z=7};
-radioQrClipboard={cls="radiobutton";text="共享剪贴板";left=685;top=435;right=772;bottom=454;bgcolor=16777215;db=1;dr=1;z=18};
-radioQrRootDir={cls="radiobutton";text="根目录";left=502;top=435;right=589;bottom=454;bgcolor=16777215;db=1;dr=1;z=16};
-radioQrUploadDir={cls="radiobutton";text="上传目录";left=593;top=435;right=680;bottom=454;bgcolor=16777215;db=1;dr=1;z=17};
-static={cls="plus";text="端口：";left=484;top=52;right=547;bottom=76;align="right";dr=1;dt=1;font=LOGFONT(h=-15);transparent=1;z=3};
-static2={cls="plus";text="网站根目录：";left=15;top=52;right=129;bottom=76;align="right";dl=1;dt=1;font=LOGFONT(h=-15);transparent=1;z=4};
-syslink={cls="syslink";text='<a href="https://github.com/aardio/qrfs">开源项目</a>';left=43;top=437;right=176;bottom=457;bgcolor=16777215;db=1;dl=1;z=15};
+radioQrClipboard={cls="radiobutton";text="共享剪贴板";left=685;top=435;right=772;bottom=454;bgcolor=0xFFFFFF;db=1;dr=1;z=18};
+radioQrRootDir={cls="radiobutton";text="根目录";left=502;top=435;right=589;bottom=454;bgcolor=0xFFFFFF;db=1;dr=1;z=16};
+radioQrUploadDir={cls="radiobutton";text="上传目录";left=593;top=435;right=680;bottom=454;bgcolor=0xFFFFFF;db=1;dr=1;z=17};
+static={cls="plus";text="端口：";left=439;top=68;right=502;bottom=92;align="right";dr=1;dt=1;font=LOGFONT(h=-15);transparent=1;z=3};
+static2={cls="plus";text="网站根目录：";left=15;top=38;right=129;bottom=62;align="right";dl=1;dt=1;font=LOGFONT(h=-15);transparent=1;z=4};
+syslink={cls="syslink";text='<a href="https://github.com/aardio/qrfs">开源项目</a>';left=43;top=437;right=176;bottom=457;bgcolor=0xFFFFFF;db=1;dl=1;z=15};
 txtMessage={cls="richedit";left=42;top=132;right=469;bottom=418;autohscroll=false;db=1;dl=1;dr=1;dt=1;link=1;multiline=1;vscroll=1;z=2}
 )
 /*}}*/
 
-import fsys.update.simpleMain;
 if( fsys.update.simpleMain(
 	"qrfs - 扫码快传",
 	"http://d.aardio.com/qrfs/update/",
@@ -34,7 +49,6 @@ if( fsys.update.simpleMain(
 	return 0;	
 }
 
-import fsys.config;
 config = fsys.config(io.appData("aardio/std/qrfs")); 
 
 import sessionHandler.default;
@@ -56,10 +70,9 @@ elseif(config.winform.qrDir=="clipboard"){
 else {
 	winform.radioQrRootDir.checked = true;
 } 
+winform.editHost.text = config.winform.editHost;
 
-import web.socket.server;
 var wsrv = web.socket.server();
-
 var srvHttp = wsrv.httpServer;
 /*
 wsrv.httpServer 是实现单线程异步 HTTP 服务端的 wsock.tcp.asynHttpServer 对象。
@@ -71,20 +84,15 @@ srvHttp.documentRoot = winform.txtMessage.text;
 srvHttp.userToken = string.random(18);
 winform.editPassword.text = srvHttp.userToken;
 
-
-import fsys.info; 
 var cacheSysIcons = {}
 var getSysIconIndex = function(path){ 
 	var sfi;
 	sfi = fsys.info.get(path, 0x100/*_SHGFI_ICON*/ | 0x4000/*_SHGFI_SYSICONINDEX*/|0x10/*_SHGFI_USEFILEATTRIBUTES*/, 
 		..fsys.isDir(path)?0x10/*_FILE_ATTRIBUTE_DIRECTORY*/?0x80/*_FILE_ATTRIBUTE_NORMAL*/);
 	 
-	if( !(sfi.returnValue ) ) {
-		return; 
-	}
+	if( !(sfi.returnValue ) ) return; 
 	
 	if(!cacheSysIcons[sfi.iIcon]){
-		var dataUrl;
 		var bmp = ..gdip.bitmap(sfi.hIcon,1/*_IMAGE_ICON*/);
 		if(bmp){
 			cacheSysIcons[sfi.iIcon] = bmp.saveToBuffer(".png"); 
@@ -95,12 +103,19 @@ var getSysIconIndex = function(path){
 	return sfi.iIcon;
 }
 
-import win.clip;
+// 文件大小格式化
+var formatSize = function(size){
+	if(size===null) return "";
+	if(size < 1024) return size + " B";
+	if(size < 1024*1024) return string.format("%.1f KB", size/1024);
+	if(size < 1024*1024*1024) return string.format("%.1f MB", size/(1024*1024));
+	return string.format("%.1f GB", size/(1024*1024*1024));
+}
+
 var cacheClientIps = {}
 srvHttp.run( 
 	function(response,request,session){ 
 		
-		//添加禁止缓存的HTTP头
 		response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
 		response.headers["Pragma"] = "no-cache";
 		response.headers["Expires"] = "0";
@@ -123,12 +138,10 @@ srvHttp.run(
 	
 		if(request.path=="/main.aardio" && request.get["icon"]){
 			var iconIdx = tonumber(request.get["icon"]);
-			if(iconIdx!==null){
-				if(cacheSysIcons[iconIdx]){
-					response.contentType = "image/png";
-					response.write(cacheSysIcons[iconIdx])
-					return;
-				}
+			if(iconIdx!==null && cacheSysIcons[iconIdx]){
+				response.contentType = "image/png";
+				response.write(cacheSysIcons[iconIdx])
+				return;
 			}
 			response.errorStatus(404);
 			return;
@@ -137,9 +150,10 @@ srvHttp.run(
 		if(request.path=="/upload/main.aardio"){
 			if(request.method=="DELETE"){
 				var path = request.postData();
-				if(path && string.startWith(path,"/upload/")){
-					path = ..io.joinpath(srvHttp.documentRoot,path)
+				if(path && string.startsWith(path,"/upload/")){
+					if(string.find(path,"\.\.")) { response.errorStatus(403); return; }
 					
+					path = ..io.joinpath(srvHttp.documentRoot,path)
 					if(io.exist(path)){
 						io.remove(path);
 						winform.txtMessage.print("已删除：" + path);
@@ -147,7 +161,6 @@ srvHttp.run(
 						return;	
 					}
 				}
-				
 				response.errorStatus(404);
 				return;
 			}
@@ -163,7 +176,6 @@ srvHttp.run(
 				
 				winform.txtMessage.text = 'HTTP 服务端已启动: \n'; 
 				winform.txtMessage.print( srvHttp.getUrl(,true) + "/?t=" + srvHttp.userToken  );
-	
 				winform.txtMessage.print( "" ); 	
 				winform.txtMessage.print( "上传成功：" + fileName ); 	
 				
@@ -174,8 +186,7 @@ srvHttp.run(
 		}
 		
 		if(!fsys.isDir(request.path) && request.path!="/<clipboard>" ) {
-			if( ..io.exist(request.path) 
-				&& (!_STUDIO_INVOKED || request.path!="/main.aardio") )
+			if( ..io.exist(request.path) && (!_STUDIO_INVOKED || request.path!="/main.aardio") )
 				return response.loadcode(request.path)
 			else {
 				request.path = fsys.getParentDir(request.path)
@@ -187,401 +198,377 @@ srvHttp.run(
 <html>
 <head>
 <meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-<title>qrfs - 扫码快传  v2.3</title>
-<style>`+$"/include/filepond.min.css"+`</style>
-<script>`+$"/include/filepond.min.js"+`</script> 
-<script>
- 
-</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>qrfs - 扫码快传</title>
+<link href="https://lib.baomitu.com/filepond/4.28.2/filepond.min.css" rel="stylesheet">
+<script src="https://lib.baomitu.com/filepond/4.28.2/filepond.min.js"></script> 
 
 <style>
- 
-html{
-	margin: 0;
-	padding: 0;
+:root {
+	--bg-color: #f7f9fc;
+	--card-bg: #ffffff;
+	--text-primary: #2c3e50;
+	--text-secondary: #5e6d82;
+	--border-color: #ebEEF5;
+	--accent-color: #0366d6;
+	--accent-hover: #024ea4;
+	--danger-color: #ff4757;
+	--upload-area-bg: #eef2f7;
+	--shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
 }
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--bg-color: #121212;
+		--card-bg: #1e1e1e;
+		--text-primary: #e0e0e0;
+		--text-secondary: #a0a0a0;
+		--border-color: #333;
+		--accent-color: #58a6ff;
+		--accent-hover: #79c0ff;
+		--danger-color: #ff6b6b;
+		--upload-area-bg: #2d2d2d;
+		--shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
+	}
+}
+
+*, *::before, *::after { box-sizing: border-box; }
 
 body {
-    padding-top: 60px;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}	
-
-li{ list-style-type:none; }
-
-.filepond-container {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 100%;
-    height: min-content;
-    z-index: 1000; 
+	margin: 0;
+	padding: 0;
+	padding-top: max(110px, env(safe-area-inset-top)); 
+	padding-bottom: max(20px, env(safe-area-inset-bottom));
+	background-color: var(--bg-color);
+	color: var(--text-primary);
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	-webkit-font-smoothing: antialiased;
 }
 
-.filepond--root {
-    min-height: 30px !important; 
-    margin-bottom: 0;
+.upload-header {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 100;
+	background: rgba(255, 255, 255, 0.85);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	padding: 12px 15px;
+	border-bottom: 1px solid var(--border-color);
+	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+	transition: background 0.3s;
 }
 
-.filepond--drop-label {
-    height: 60px !important; 
+@media (prefers-color-scheme: dark) {
+	.upload-header { background: rgba(30, 30, 30, 0.85); }
 }
 
-.filepond--panel-root { 
-    min-height:  30px !important;  
-    border: 2px dashed #99aab5;
+.filepond--root { margin-bottom: 0; min-height: 46px !important; }
+.filepond--panel-root { background-color: var(--card-bg); border: 2px dashed var(--border-color); }
+.filepond--drop-label { color: var(--text-secondary); }
+
+.native-upload {
+	display: block; width: 100%; padding: 10px;
+	background: var(--card-bg); border: 1px solid var(--border-color);
+	border-radius: 8px; color: var(--text-secondary);
 }
-
-.filepond--drop-label {
-    color: #718096;
-    min-height:  30px !important; 
-}
-
-.filepond--item {
-    min-height:  30px !important;
-    margin: 0 !important;
-}
-
-.filepond--file{
-	min-width: 100%;
-    padding-right: 80px;
-}
-
-.filepond--file-info {
-    min-height: auto !important;
-    margin: 0 !important;
-}
-
-.filepond--label-action {
-    color: #3498db;
-}
-
-.filepond--file-status {
-    margin: 0 !important;
-    min-height: auto !important;
-}
-
-.filepond--credits {
-    display: none;
-}
-
-.filepond--file-wrapper {
-    height: 100% !important;
-    display: flex;
-    align-items: center;
-}
-
-.filepond--processing-complete-indicator {
-    margin: 0 !important;
-}
-
-ul{
-  margin-top:0px;
-}
-
-p, li {
-    line-height: 1.7;
-    white-space: nowrap;
-    text-overflow: ellipsis; 
-    overflow: hidden; 
-    font-size: 1.1em;
-}
-
-li img{
-	vertical-align: middle;
-	width: 1.7em !important;
-	height: 1.7em !important;
-	padding-right: 5px;
-}
-
-
-a {
-    color: #0366d6; 
-    text-decoration: none;
-    font-size: 1.1em !important;
-}
-
-a:hover {
-    text-decoration: underline;
-    color: #0056b3;
-}
-
-a.absent {
-    color: #cc0000; 
-}
-
-a.anchor {
-    display: block;
-    padding-left: 30px;
-    margin-left: -30px;
-    cursor: pointer;
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0; 
-}
-
-h1, h2, h3, h4, h5, h6 {
-	line-height: 1.5em;
-    margin: 15px 0 10px;
-    padding: 0;
-    font-weight: bold;
-    -webkit-font-smoothing: antialiased;
-    cursor: text;
-    position: relative; 
-} 
 
 h2 {
-    font-size: 1.3em;
-    padding-bottom: 6px;
-    border-bottom: 1px solid #DEE3E8;
-    color: #333;
-    margin-top:5px;
-    margin-bottom: 5px;
-    vertical-align: middle;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+	font-size: 1.1rem;
+	margin: 10px 15px 15px 15px;
+	color: var(--text-secondary);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	font-weight: 600;
 }
 
 .back-btn {
-    padding: 8px 15px;  
-    cursor: pointer;
-    font-size: 0.8em;
-    margin-left: 10px;
-    font-weight: 400;
-} 
+	padding: 6px 12px; font-size: 0.85rem;
+	background: var(--upload-area-bg); color: var(--accent-color);
+	border-radius: 6px; text-decoration: none; font-weight: 500;
+}
+
+ul {
+	list-style: none; padding: 0 15px; margin: 0;
+	display: flex; flex-direction: column; gap: 10px;
+}
+
+li {
+	background: var(--card-bg); border-radius: 10px;
+	box-shadow: var(--shadow);
+	display: flex; align-items: center; overflow: hidden;
+	transition: transform 0.1s;
+}
+li:active { transform: scale(0.99); }
+
+li a {
+	flex: 1; display: flex; align-items: center;
+	padding: 16px; text-decoration: none;
+	color: var(--text-primary); font-size: 1rem; overflow: hidden;
+}
+
+li img { width: 24px; height: 24px; margin-right: 12px; object-fit: contain; flex-shrink: 0; }
+li span.fname { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; margin-right: 10px; }
+li span.fsize { font-size: 0.8rem; color: var(--text-secondary); white-space: nowrap; }
+
+.del-btn {
+	background-color: var(--danger-color); color: white;
+	border: none; padding: 0 16px; height: auto;
+	font-weight: 600; font-size: 0.9rem; cursor: pointer;
+	align-self: stretch; display: flex; align-items: center;
+	margin-left: 1px; /* 分隔线 */
+}
 
 .clipboard-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 0 10px;
-    max-height: calc(100vh - 20px);
+	padding: 0 15px; display: flex; flex-direction: column; height: calc(100vh - 100px);
 }
-
-.text-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 15px;
-    position: relative;
-    max-height: 100%;
-}
-
 .clipboard-content {
-    width: 100%;
-    height: 100%;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 1.1em;
-    background-color: #fff;
-    resize: none;
-    box-sizing: border-box;
-    line-height: 1.5;
+	flex: 1; width: 100%; padding: 15px;
+	border: 1px solid var(--border-color); border-radius: 12px;
+	font-size: 1.1em; background-color: var(--card-bg); color: var(--text-primary);
+	resize: none; line-height: 1.6; outline: none; margin-bottom: 15px;
 }
+.clipboard-content:focus { border-color: var(--accent-color); box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1); }
 
-.clipboard-content:focus {
-    outline: none;
-    border-color: #2196F3;
-    height: 100% !important;
-    position: relative !important;
-    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+.btn-group { display: flex; gap: 10px; }
+.btn-main {
+	flex: 1; padding: 12px; border: none; border-radius: 10px;
+	font-size: 1rem; font-weight: 600; cursor: pointer;
+	color: white; text-align: center;
 }
+.btn-copy { background-color: var(--accent-color); }
+.btn-paste { background-color: #2ecc71; }
 
-.button-group {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 16px;
-    position: sticky;
-    bottom: 0;
-    background-color: #fff;
-    padding: 10px 0;
-    z-index: 100;
+.toast {
+	position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+	background: rgba(0,0,0,0.8); color: #fff; padding: 10px 20px;
+	border-radius: 20px; font-size: 0.9em; z-index: 9999;
+	opacity: 0; transition: opacity 0.3s; pointer-events: none;
 }
-
-button {
-    flex: 1;
-    padding: 16px 0;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.2em;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    color: white;
-}
-
-.copy-btn {
-    background-color: #2196F3;
-}
-
-button:active {
-    opacity: 0.8;
-}
- 
+.toast.show { opacity: 1; }
+.empty-tip { text-align: center; padding: 40px; color: var(--text-secondary); }
 </style>
 </head>
-<body> 
+<body>
 
-<script crossorigin="anonymous"> 
-websocket = new WebSocket("`+wsrv.getUrl("ws",true)+`");
+<div id="toast" class="toast"></div>
 
-var clipboardContent;
-websocket.onmessage = function(evt) {
-    if(evt.data=="reload"){
-        window.location.pathname = "/";
-    	window.location.reload(true)
-    }
-    else{ 
-        if(clipboardContent){
-        	clipboardContent.value = evt.data;
-        }
-    }
-};   
+<script>
+let websocket;
+let wsReconnectAttempts = 0;
+const wsUrl = "`+wsrv.getUrl("ws",true)+`";
+
+function connectWebSocket() {
+	websocket = new WebSocket(wsUrl);
+	websocket.onopen = function() { wsReconnectAttempts = 0; };
+	websocket.onmessage = function(evt) {
+		if (evt.data === "reload") {
+			if(window.location.pathname === '/' || window.location.pathname.startsWith('/upload')) {
+				window.location.reload();
+			}
+		} else {
+			const clipboardContent = document.getElementById('clipboardContent');
+			if (clipboardContent && document.activeElement !== clipboardContent) {
+				clipboardContent.value = evt.data;
+			}
+		}
+	};
+	websocket.onclose = function() {
+		if (wsReconnectAttempts < 5) {
+			const delay = Math.min(1000 * Math.pow(1.5, wsReconnectAttempts), 10000);
+			setTimeout(connectWebSocket, delay);
+			wsReconnectAttempts++;
+		}
+	};
+}
+connectWebSocket();
+
+function showToast(msg) {
+	const toast = document.getElementById('toast');
+	toast.textContent = msg;
+	toast.classList.add('show');
+	setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+function deleteFile(path, btn) {
+	if(event) { event.preventDefault(); event.stopPropagation(); }
+	if (!confirm('确定要删除此文件吗？')) return;
+	
+	fetch('/upload/?t=`+srvHttp.userToken+`', { method: 'DELETE', body: path })
+	.then(res => {
+		if (res.ok) {
+			const li = btn.closest('li');
+			li.style.opacity = '0';
+			setTimeout(() => {
+				li.remove();
+				if(document.querySelectorAll('ul li').length === 0) location.reload();
+			}, 300);
+			showToast('已删除');
+		} else { showToast('删除失败'); }
+	}).catch(() => showToast('请求失败'));
+}
 </script>
 `)
 
-
 if(request.path!="/<clipboard>/"){
 	response.write(`
-<div class="filepond-container">
-<input type="file" class="filepond" name="filepond" multiple>
+<div class="upload-header">
+	<input type="file" class="filepond" name="filepond" multiple>
 </div>
-<script crossorigin="anonymous"> 
-if(document.body.style.order === undefined){
-	alert("浏览器版本过低,请使用Chrome或IE11以上版本浏览器打开此页面!")
+<script>
+if (typeof FilePond !== 'undefined') {
+	FilePond.create(document.querySelector('input[type="file"]'), {
+		server: '/upload/?t=`+srvHttp.userToken+`',
+		labelIdle: '点击或拖拽上传文件',
+		labelFileProcessingComplete: '成功',
+		credits: false,
+		onprocessfiles: function() {
+			if (window.location.pathname === '/' || window.location.pathname.startsWith('/upload')) {
+				setTimeout(() => window.location.reload(), 500);
+			}
+		}
+	});
+} else {
+	const input = document.querySelector('input[type="file"]');
+	input.className = 'native-upload';
+}
+</script>`)
+}
+		
+var pathDisplay = string.html.escape(request.path);
+var backButton = "";
+var isUploadDir = (request.path=="/upload/");
+
+if(request.path=="/<clipboard>/"){
+	pathDisplay = "共享剪贴板";
+	backButton = `<a class="back-btn" href="/?t=`+srvHttp.userToken+`">返回首页</a>`;
+}
+elseif(request.path=="/upload/"){
+	pathDisplay = "上传目录";
+	backButton = `<a class="back-btn" href="/?t=`+srvHttp.userToken+`">返回首页</a>`;
+}
+elseif(request.path=="/") {
+	pathDisplay = "文件列表";
+	backButton = ""; 
+}
+else {
+	pathDisplay = string.html.escape(inet.url.decode(request.path));
+	var parentPath = fsys.getParentDir(request.path);
+	if(!#parentPath) parentPath = "/";
+	backButton = `<a class="back-btn" href="`+parentPath+`?t=`+srvHttp.userToken+`">返回上一级</a>`;
 }
 
-var inputElement = document.querySelector('input[type="file"]');
-FilePond.create(inputElement,{
-	onprocessfiles: function(){
-		`+ (..io.exist("/upload/") ? "" : "	if (window.location.pathname === '/') window.location.reload(true);") +`
-		
-		if (window.location.pathname === '/upload/'){
-			window.location.reload(true)
-		} 
+response.write(`<h2><span>` + pathDisplay + `</span>` + backButton + `</h2>`);
+
+if(request.path=="/<clipboard>/"){
+	var clipText = win.clip.read() : "";
+	response.write(`
+<div class="clipboard-container">
+	<textarea id="clipboardContent" class="clipboard-content" placeholder="在此输入文字，将同步到电脑...">`
+	+string.html.escape(clipText)+`</textarea>
+	<div class="btn-group">
+		<button id="copyBtn" class="btn-main btn-copy">复制</button> 
+		<button id="pasteBtn" class="btn-main btn-paste">粘贴</button>
+	</div>
+</div>
+
+<script>
+document.body.style.paddingTop = '20px';
+const header = document.querySelector('.upload-header');
+if(header) header.style.display = 'none';
+
+const clipboardContent = document.getElementById('clipboardContent');
+clipboardContent.addEventListener('input', (e) => {
+	if (websocket && websocket.readyState === WebSocket.OPEN) {
+		websocket.send(e.target.value);
 	}
-	
-});
-FilePond.setOptions({
-	server: '/upload/?t=` + srvHttp.userToken + `',
-	labelIdle: '拖拽 / <span class="filepond--label-action">选择上传文件</span>',
-	labelFileProcessing: '上传中...',
-	labelFileProcessingComplete: '上传成功',
-	labelTapToUndo: '点击撤消',
-	labelTapToCancel: '点击取消',
-	labelTapToRetry: '点击重试',
-	labelFileLoadError: '上传时遇到错误'
 });
 
-</script> `)
+document.getElementById('copyBtn').addEventListener('click', async function() {
+	try {
+		await navigator.clipboard.writeText(clipboardContent.value);
+		showToast('已复制');
+	} catch (e) {
+		clipboardContent.select();
+		document.execCommand('copy');
+		showToast('已尝试复制');
+	}
+});
+
+document.getElementById('pasteBtn').addEventListener('click', async function() {
+	try {
+		const text = await navigator.clipboard.readText();
+		clipboardContent.value = text;
+		if (websocket && websocket.readyState === WebSocket.OPEN) websocket.send(text);
+		showToast('已粘贴');
+	} catch (e) {
+		const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+		const tip = isMobile ? '请在输入框内长按粘贴 📋' : '请使用快捷键 Ctrl+V 粘贴 ⌨️';
+		showToast(tip);
+		clipboardContent.focus();
+	}
+});
+</script>
+</body></html>`)
+	return;
 }
-		
-		if(request.path=="/<clipboard>/"){
-			response.write(`<h2>/共享剪贴板/ 📋 <a class="back-btn" onclick="javascript:location.href='/'">⬑父目录</a></h2>`)
-		}
-		elseif(request.path=="/upload/"){
-			response.write(`<h2>当前目录：/upload/ 📤 <a class="back-btn" onclick="javascript:location.href='/'">⬑父目录</a></h2><ul>`)
-		}
-		elseif(#request.path>2){
-			if(string.find(request.path,"^/[^/]+/$")){
-				response.write(`<h2>当前目录：`
-					,request.path,` <a class="back-btn" onclick="javascript:location.href='/'">⬑父目录</a></h2><ul>`)
-			}
-			else{
-				response.write(`<h2>当前目录：`
-					,request.path,`</h2> <a class="back-btn" onclick="history.back()">⬑父目录</a> <ul>`)
-			}
-		}
-		else {
-			response.write(`<h2>当前目录：`
-					,request.path,`</h2><ul>`)
-		} 
 
-		if(request.path=="/" && ..io.exist("/upload/")){
-			response.write('<li><img src="/?icon='++getSysIconIndex("/upload/")+'"><a href="/upload?t=' + srvHttp.userToken + '">上传目录 📤</a><br>\r\n');	
-		}
-		
-		if(request.path=="/<clipboard>/"){
-		
-			response.write(`
-	 
-    <div class="clipboard-container">
-        <div class="text-container">
-            <textarea id="clipboardContent" class="clipboard-content" >`+(win.clip.read():"")+`</textarea>
-        </div>
-        
-        <div class="button-group">
-            <button id="copyBtn" class="copy-btn">复制</button> 
-        </div> 
-    </div>	
-    
-    <script>
-    document.body.style.paddingTop = 0;
-    
-    clipboardContent = document.getElementById('clipboardContent');
-    
-    clipboardContent.addEventListener('input', (e) => {
-          websocket.send(e.target.value);
-    });
-     
-    const copyBtn = document.getElementById('copyBtn'); 
-    
-    copyBtn.addEventListener('click', () => { 
-        clipboardContent.select();
-        document.execCommand('copy'); 
-        
-        const originalText = copyBtn.textContent;
-        copyBtn.textContent = '已复制！';
-        setTimeout(() => {
-            copyBtn.textContent = originalText;
-        }, 1500);
-    });
-  
-    clipboardContent.addEventListener('focus', () => {
-        setTimeout(() => {
-            window.scrollTo(0, 0);
-        }, 100);
-    });
-        
-    </script></body></html>
-`)
-			return;
-		}
-		elseif(request.path=="/") {
-			response.write('<li><img src="/?icon='++getSysIconIndex("*.txt")+'"><a href="/%3Cclipboard%3E/?t=' + srvHttp.userToken + '">共享剪贴板 📋</a><br>\r\n');	
-		}
+response.write(`<ul>`);
 
-		var file,dir = fsys.list(request.path,,"*.*");
-		for(i=1;#dir;1){
-			if(dir[i]==="upload" && request.path=="/") continue;
-			
-			var iconIdex = getSysIconIndex(dir[dir[ i ]])
-			response.write('<li><img src="/?icon='++(iconIdex)+'"><a href="'
-				,inet.url.append(request.path, inet.url.encode(dir[ i ]) )
-				,'?t=' + srvHttp.userToken + '">',dir[ i ],'</a><br>\r\n');
-		}
-		
-		for(i=1;#file;1){
-			var iconIdex = getSysIconIndex(file[file[ i ]])
-			response.write('<li><img src="/?icon='++(iconIdex)+'"><a href="'
-					,inet.url.append(request.path,inet.url.encode(file[ i ]) )
-					,'?t=' + srvHttp.userToken + '">',file[ i ],'</a><br>\r\n');
-		}
-		
-		response.write("</ul></body></html>")
+if(request.path=="/" && ..io.exist("/upload/")){
+	response.write('<li><a href="/upload/?t='+srvHttp.userToken+'"><img src="/?icon='++getSysIconIndex("/upload/")
+		++'"><span class="fname">上传目录 (可删除)</span></a></li>\r\n');	
+}
+
+if(request.path=="/") {
+	response.write('<li><a href="/%3Cclipboard%3E/?t='+srvHttp.userToken+'"><img src="/?icon='++getSysIconIndex("*.txt")
+		++'"><span class="fname">共享剪贴板</span></a></li>\r\n');	
+}
+
+var file,dir = fsys.list(request.path,,"*.*");
+var hasContent = false;
+
+for(i=1;#dir;1){
+	if(dir[i]==="upload" && request.path=="/") continue;
+	hasContent = true;
+	var iconIdx = getSysIconIndex(dir[dir[i]]);
+	response.write('<li><a href="'
+		,inet.url.append(request.path, inet.url.encode(dir[i]))
+		,'?t='+srvHttp.userToken+'"><img src="/?icon='++(iconIdx)++'"><span class="fname">',string.html.escape(dir[i]),'</span></a></li>\r\n');
+}
+
+for(i=1;#file;1){
+	hasContent = true;
+	var iconIdx = getSysIconIndex(file[file[i]]);
+	var encodedPath = inet.url.append(request.path, inet.url.encode(file[i]));
+	var filePath = string.replace(request.path + file[i], "//", "/");
+	// 获取文件大小
+	var fileSize = io.getSize( io.joinpath(srvHttp.documentRoot, request.path, file[i]) );
+	
+	response.write('<li><a href="'
+		,encodedPath,'?t='+srvHttp.userToken+'"><img src="/?icon='++(iconIdx)++'"><span class="fname">',string.html.escape(file[i]),'</span>');
+	
+	// 显示文件大小
+	response.write('<span class="fsize">' + formatSize(fileSize) + '</span></a>');
+	
+	if(isUploadDir){
+		var jsPath = string.replace(filePath,"'","\\'"); 
+		response.write('<button class="del-btn" onclick="deleteFile(\''
+			,jsPath,'\', this)">删除</button>');
+	}
+	response.write('</li>\r\n');
+}
+
+if(!hasContent && request.path!="/"){
+	response.write('<li class="empty-tip">📭 目录为空</li>');
+}
+
+response.write("</ul></body></html>")
 	} 	
 );
 
-import qrencode.bitmap;
 var serverInfo = function(){
 	var ip,port = srvHttp.getLocalIp();
 	winform.editPort.text = port;
@@ -596,8 +583,31 @@ var serverInfo = function(){
 	}
 	
 	var url = srvHttp.getUrl(home,true);
+	
+	var customUrl = string.trim(winform.editHost.text);
+	if(#customUrl){ 
+		if( inet.url.is(customUrl,-1) ){
+			url = customUrl;
+		}
+		elseif(string.startsWith(customUrl,"natapp:",true)){
+		 	url = winform.natAppTunnelUrl;
+		} 
+		else{
+			url = "http://"+customUrl;
+		} 
+	} 
+	
+	var tUrl = inet.url.split(url);
+	if(!tUrl){
+		return winform.msgboxErr("指定了错误的网址");
+	}
+	
+	url = tostring( tUrl ); //移除 80 端口号
+	
 	if(#srvHttp.userToken){
-		url = url ++ "?t=" + srvHttp.userToken;
+		url = inet.url.appendExtraInfo(url,{
+			t = srvHttp.userToken;
+		})
 	} 
 	
 	winform.txtMessage.text = 'HTTP 服务端已启动: \n'; 
@@ -624,9 +634,39 @@ serverInfo();
 winform.btnStart.oncommand = function(id,event){
 	winform.txtMessage.text = "";
 	winform.btnStart.disabledText = {'\uF254';'\uF251';'\uF252';'\uF253';'\uF250'}
-	win.delay(500);
+	thread.delay(500);
  
+	var customUrl = string.trim(winform.editHost.text);
+	if(#customUrl){ 
+		if(string.startsWith(customUrl,"natapp:",true)){
+			if(..natapp){
+				..natapp.terminate()
+			}
+			
+		 	var token = string.right(customUrl,-8); 
+		 	
+		 	import process.natapp;
+		 	..natapp = process.natapp(token,winform.edi,"INFO")
+		 	if(natapp[["tunnelUrl"]]){
+		 		winform.natAppTunnelUrl = natapp.tunnelUrl;
+		 		winform.editPort.text = 80;
+		 	}
+		 	else{
+		 		winform.btnStart.disabledText = null;
+		 		return winform.msgboxErr("错误的 NATAPP 令牌");
+		 	}
+		}
+		
+		config.winform.editHost = customUrl; 
+	}
+	else{
+		config.winform.editHost = null;
+	}
+	
+	config.saveAll();
+	
 	var port = tonumber(winform.editPort.text);
+	
 	srvHttp.documentRoot = fsys.isDir(winform.editDocumentRoot.text) ? winform.editDocumentRoot.text;
 	srvHttp.userToken = winform.editPassword.text;
 	srvHttp.start("0.0.0.0",port);
@@ -635,11 +675,9 @@ winform.btnStart.oncommand = function(id,event){
 	winform.btnStart.disabledText = null;
 }
 
-import win.ui.menu;
 winform.txtMessage.enablePopMenu();
 winform.txtMessage.onHyperlink = function(message,href){
 	if( message = 0x202/*_WM_LBUTTONUP*/ ) {
-		import process;
 		process.openUrl(href);
 	}
 }
@@ -658,7 +696,6 @@ winform.onDropFiles = function(files){
 	wsrv.publish("reload");
 }
 
-import fsys.dlg.dir;
 winform.btnOpen.oncommand = function(id,event){
 	var dir = fsys.dlg.dir(winform.editDocumentRoot.text,winform)
 	if(dir){
@@ -671,7 +708,6 @@ winform.btnOpen.oncommand = function(id,event){
 	}
 }
 
-import process;
 winform.btnOpenUpload.oncommand = function(id,event){
 	var path = io.joinpath(winform.editDocumentRoot.text,"upload")
 	if(io.createDir(path)){
@@ -679,8 +715,6 @@ winform.btnOpenUpload.oncommand = function(id,event){
 	}
 }
 
-import win.clip;
-import win.clip.viewer;
 var clipViewer = win.clip.viewer(winform);
 clipViewer.onDrawClipboard=function(){
 	var str = win.clip.read();	
@@ -728,9 +762,33 @@ winform.radioQrClipboard.oncommand = function(id,event){
 	updateHomeDir();
 }
 
-import win.ui.simpleWindow2;
 win.ui.simpleWindow2(winform);
 winform.show();  
+
+var revealIcon = winform.editPassword.addCtrl(
+	cls="plus";
+	marginRight=0;marginBottom=2;
+	width=24; 
+	iconText = '\uF023';
+	iconStyle={
+		align="right";font=LOGFONT(h=-15;name='FontAwesome');padding={top=3}
+	}
+)
+
+revealIcon.skin({
+	color = {
+		default = 0xC0000000;
+		hover = 0xFFFF0000;
+		active = 0xFF00FF00;
+	};
+	checked = {
+		iconText = '\uF06E';
+	}
+})
+
+revealIcon.onMouseClick = function(){
+    winform.editPassword.editBox.passwordChar = !owner.checked ? "*" : null;
+}
 
 winform.btnStart.skin( {
 	background={
