@@ -1,7 +1,9 @@
 # qrfs - 扫码快传
 内网扫码共享文件与剪贴板，不走公网速度更快更安全。
 
-[下载](dist/qrfs.7z) 仅 726 KB。软件非常小，简单方便，传输大文件快如闪电。软件兼容 XP，Vista，Win7，Win8，Win10，Win11 等所有桌面操作系统。
+> 强烈推荐: [A_A - 安卓手机投屏与自动化助手（支持共享剪贴板、快速传文件，更快更方便）](https://www.aau.cn)
+
+发布版体积仅 726 KB（请自行编译）。软件非常小，简单方便，传输大文件快如闪电。软件兼容 XP，Vista，Win7，Win8，Win10，Win11 等所有桌面操作系统。
 
 ![qrfs 电脑界面截图](screenshots/qrfs2.jpg)
 
@@ -10,11 +12,12 @@
 **不需要在手机上安装任何客户端！**
 
 - 文件上传目录为网站根目录下的 `/upload/` 目录 。
-- 手机可在扫码打开的主页点击【共享剪贴板】，也可以选择扫码直接打开【共享剪贴板】，手机端可同步显示电脑端的剪贴板文本，在手机端修改文本也会同步更新电脑剪贴板（ 双向同步 ）。 
+- 手机可在扫码打开的主页点击【共享剪贴板】，也可以选择扫码直接打开【共享剪贴板】，手机端可同步显示电脑端的剪贴板文本，在手机端修改文本也会同步更新电脑剪贴板（ 双向同步 ）
+- 可使用手机输入法（例如语音输入法）在电脑上输入文本，支持 AI 优化语音识别结果，可添加与配置不同的 AI 助手。
 
 ![qrfs 手机界面截图](screenshots/phone.jpg)
 
-此软件基于 [aardio](https://www.aardio.com) 标准库中的 wsock.tcp.asynHttpServer  - 由 纯 aardio 代码实现的单线程异步 HTTP 服务端，体积仅数十 KB，可运行 aardio 开发的网站。支持高速上传下载、断点续传、304 缓存、分块传输、Keep Alive。支持共享端口的 HTTP / WebSocket 双服务端（ 由标准库 web.socket.server 实现）。
+此软件基于 [aardio](https://www.aardio.com) 标准库中的 wsock.tcp.asynHttpServer  - 由 纯 aardio 代码实现的单线程异步 HTTP / WebSocket 双服务端，体积仅数十 KB，可运行 aardio 开发的网站。
 
 aardio 标准库中有以下几个 HTTP 服务端库
 - wsock.tcp.asynHttpServer 单线程异步服务端。
